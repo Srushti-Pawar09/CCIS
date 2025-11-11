@@ -1,9 +1,31 @@
-from flask import Flask 
+from flask import Flask, jsonify, request 
+ 
 app = Flask(__name__) 
  
-@app.route("/") 
+data = [ 
+    {"id": 1, "name": "Sanket"}, 
+    {"id": 2, "name": "Student"} 
+] 
+ 
+@app.route('/') 
 def home(): 
-    return "Hello from Cloud PaaS using Render!" 
+    return "Cloud API Home" 
+@app.route('/users', methods=['GET']) 
+def get_users(): 
+    return jsonify(data) 
+ 
+@app.route('/users', methods=['POST']) 
+def add_user(): 
+    new_user = request.json 
+    data.append(new_user) 
+    return jsonify(new_user), 201 
+ 
+@app.route('/users/<int:user_id>', methods=['GET']) 
+def get_user(user_id): 
+    user = next((u for u in data if u["id"] == user_id), None) 
+    if user: 
+        return jsonify(user) 
+    return jsonify({"error": "User not found"}), 404 
  
 if __name__ == "__main__": 
-    app.run() 
+    app.run(host="0.0.0.0", port=5000) 
